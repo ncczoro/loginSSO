@@ -19,10 +19,13 @@ namespace login1.Controllers
         public ActionResult logIn(logIn userPass)
         {
             string authCode = "";
+            string msg = "lan 1111";
+
             string MyUrl = Request.Url.AbsoluteUri;
             if (MyUrl.IndexOf("code=") > -1)
             {
                 authCode = MyUrl.Substring(MyUrl.IndexOf("code=") + 5, 36);
+                // sessionID = 
                 if (authCode != "")
                 {
                     string strToken = getToken(authCode);
@@ -32,9 +35,13 @@ namespace login1.Controllers
                         if (strUserInfor != null)
                         {
                             JObject jsonUserInfor = JObject.Parse(strUserInfor);
-                            string strGioiTinh = (string)jsonUserInfor.SelectToken("GioiTinh");
                             var userInforBinding = new UserInfor();
-                            userInforBinding.GioiTinh = strGioiTinh;
+                            userInforBinding.GioiTinh = (string)jsonUserInfor.SelectToken("GioiTinh");
+                            userInforBinding.HoVaTen = (string)jsonUserInfor.SelectToken("HoVaTen");
+                            userInforBinding.DiaChi = (string)jsonUserInfor.SelectToken("DiaChi");
+                            userInforBinding.SoCMND = (string)jsonUserInfor.SelectToken("SoCMND");
+                            userInforBinding.SoDienThoai = (string)jsonUserInfor.SelectToken("SoDienThoai");
+                            userInforBinding.ThuDienTu = (string)jsonUserInfor.SelectToken("ThuDienTu");
 
                             return View("Contact", userInforBinding);
                         }
@@ -45,8 +52,20 @@ namespace login1.Controllers
 
             if (userPass.userName == "admin" && userPass.passWord == "admin")
             {
-                return View("Contact");
+                var userInforBinding = new UserInfor();
+                userInforBinding.GioiTinh = "1232321321";
+                userInforBinding.HoVaTen = " ";
+                userInforBinding.DiaChi = " ";
+                userInforBinding.SoCMND = " ";
+                userInforBinding.SoDienThoai = " ";
+                userInforBinding.ThuDienTu = " ";
+                msg += "kookoko" + userInforBinding.GioiTinh  + "berak line";
+                string mgess = "line 2";
+                Response.Write("<script>console.log(' " + msg + "'  + ' " + mgess + "');</script>");
+                    
+                return View("Contact", userInforBinding);
             }
+            Response.Write("<script>console.log(' "+ msg +"');</script>");
             return View("Index");
         }
 
@@ -57,7 +76,9 @@ namespace login1.Controllers
         }
         public ActionResult logOut()
         {
+            // call api revoke token
             // call api logout
+
             return View("Index");
         }
 
@@ -91,6 +112,8 @@ namespace login1.Controllers
             {
                 JObject jsonResponse = JObject.Parse(responseString);
                 string strAccessToken = (string)jsonResponse.SelectToken("access_token");
+                string idToken  = (string)jsonResponse.SelectToken("id_token");
+
                 return strAccessToken;
             }
             return null;

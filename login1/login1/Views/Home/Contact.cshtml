@@ -2,10 +2,16 @@
 @{
     ViewBag.Title = "Trang chủ";
 }
+@model login1.Models.UserInfor
 
     <div class="jumbotron">
         <h2>Đăng nhập thành công</h2>
-        <p>{userInforBinding.GioiTinh}</p>
+        <p>Họ và tên: @Model.HoVaTen</p>
+        <p>Số CMND: @Model.SoCMND</p>
+        <p>Giới tính: @Model.GioiTinh</p>
+        <p>Địa chỉ: @Model.DiaChi</p>
+        <p>Số điện thoại: @Model.SoDienThoai</p>
+        <p>Email : @Model.ThuDienTu</p>
         @Html.ActionLink("Log out", "logOut", "Home", new { area = "" }, new { @class = "navbar-brand" })
 
     </div>
