@@ -31,9 +31,12 @@ namespace login1.Controllers
                         string strUserInfor = getUserInfor(strToken);
                         if (strUserInfor != null)
                         {
-                            UserInfor userInforBinding = new UserInfor();
-                            ViewData["Contact"] = "Your application description page." + strUserInfor;
-                            return View("Contact");
+                            JObject jsonUserInfor = JObject.Parse(strUserInfor);
+                            string strGioiTinh = (string)jsonUserInfor.SelectToken("GioiTinh");
+                            var userInforBinding = new UserInfor();
+                            userInforBinding.GioiTinh = strGioiTinh;
+
+                            return View("Contact", userInforBinding);
                         }
                     }
                 }
