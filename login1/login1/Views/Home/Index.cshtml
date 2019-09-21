@@ -1,0 +1,28 @@
+﻿@{
+    ViewBag.Title = "LOG IN";
+}
+
+<html>
+<head>
+
+</head>
+<body>
+    <div class="jumbotron">
+        <h1>LOGIN</h1>
+        <form action="logIn" method="post">
+            <input type="text" name="userName" placeholder="Tên đăng nhập = admin" />
+            <br />  <br />
+            <input type="text" name="passWord" placeholder="Mật khẩu = admin" />
+            <br />
+            <br />
+            <input type="submit" value="Đăng nhập" />
+        </form>
+
+        @Html.ActionLink("Đăng nhập bằng DVCQG", "Login_byDVCQG", "Home", new { area = "" }, new { @class = "navbar-brand" })
+
+    </div>
+</body>
+</html>
+   
+        
+        
