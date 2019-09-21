@@ -7,7 +7,6 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.UI;
 using login1.Models;
-using System.Net.Http;
 using System.Net;
 using System.Text;
 using System.IO;
@@ -17,7 +16,6 @@ namespace login1.Controllers
 {
     public class HomeController : Controller
     {
-        private static readonly HttpClient client = new HttpClient();
         public ActionResult logIn(logIn userPass)
         {
             string authCode = "";
@@ -25,19 +23,28 @@ namespace login1.Controllers
             if (MyUrl.IndexOf("code=") > -1)
             {
                 authCode = MyUrl.Substring(MyUrl.IndexOf("code=") + 5, 36);
-                if(authCode != "")
+                if (authCode != "")
                 {
-                    getToken(authCode);
-                    return View("Contact");
+                    string strToken = getToken(authCode);
+                    if (strToken != null)
+                    {
+                        string strUserInfor = getUserInfor(strToken);
+                        if (strUserInfor != null)
+                        {
+                            UserInfor userInforBinding = new UserInfor();
+                            ViewData["Contact"] = "Your application description page." + strUserInfor;
+                            return View("Contact");
+                        }
+                    }
                 }
 
             }
 
             if (userPass.userName == "admin" && userPass.passWord == "admin")
             {
-              return View("Contact");
+                return View("Contact");
             }
-              return View("Index");
+            return View("Index");
         }
 
         public ActionResult Login_byDVCQG()
@@ -51,7 +58,7 @@ namespace login1.Controllers
             return View("Index");
         }
 
-        static  void getToken(string authCode)
+        static string getToken(string authCode)
         {
             var request = (HttpWebRequest)WebRequest.Create("https://wso2.vnpttiengiang.vn:9443/oauth2/token");
 
@@ -81,23 +88,24 @@ namespace login1.Controllers
             {
                 JObject jsonResponse = JObject.Parse(responseString);
                 string strAccessToken = (string)jsonResponse.SelectToken("access_token");
-                getUserInfor(strAccessToken);
+                return strAccessToken;
             }
+            return null;
 
         }
 
-        static void getUserInfor(string accessToken)
+        static string getUserInfor(string accessToken)
         {
             var request = (HttpWebRequest)WebRequest.Create("https://wso2.vnpttiengiang.vn:9443/oauth2/userinfo");
 
             var postData = "scope=" + Uri.EscapeDataString("openid");
             var data = Encoding.ASCII.GetBytes(postData);
 
-            //request.AuthenticationLevel = accessToken;
             request.Method = "POST";
             request.ContentType = "application/x-www-form-urlencoded";
             request.Accept = "application/json";
             request.ContentLength = data.Length;
+            request.Headers.Add("Authorization", "Bearer " + accessToken);
 
             using (var stream = request.GetRequestStream())
             {
@@ -107,8 +115,13 @@ namespace login1.Controllers
             var response = (HttpWebResponse)request.GetResponse();
 
             var responseString = new StreamReader(response.GetResponseStream()).ReadToEnd();
+            if (responseString != null && responseString.Length > 0)
+            {
+                Console.WriteLine(response + responseString);
+                return responseString;
+            }
+            return null;
 
-            Console.WriteLine(response + responseString);
         }
 
     }
